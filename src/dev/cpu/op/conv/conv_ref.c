@@ -179,10 +179,10 @@ static int ref_conv_fp16(struct ir_tensor* input_tensor, struct ir_tensor* outpu
     int kernel_offset = 0;
     int output_offset = 0;
 
-    __fp16* input_data = input_tensor->data;
-    __fp16* output_data = output_tensor->data;
-    __fp16* kernel_data = kernel->data;
-    __fp16* bias_data = NULL;
+    _fp16* input_data = input_tensor->data;
+    _fp16* output_data = output_tensor->data;
+    _fp16* kernel_data = kernel->data;
+    _fp16* bias_data = NULL;
     if (bias != NULL)
         bias_data = bias->data;
 

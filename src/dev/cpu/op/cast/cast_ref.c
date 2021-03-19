@@ -91,7 +91,7 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
     if (type_from == TENGINE_DT_FP32 && type_to == TENGINE_DT_FP16)
     {
         float* idata = ( float* )input_tensor->data;
-        __fp16* odata = ( __fp16* )output_tensor->data;
+        _fp16* odata = ( _fp16* )output_tensor->data;
 
 #pragma omp parallel for num_threads(num_thread)
         for (int i = 0; i < input_tensor->elem_num; i++)
@@ -104,7 +104,7 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
 
     if (type_from == TENGINE_DT_FP16 && type_to == TENGINE_DT_FP32)
     {
-        __fp16* idata = ( __fp16* )input_tensor->data;
+        _fp16* idata = ( _fp16* )input_tensor->data;
         float* odata = ( float* )output_tensor->data;
 
 #pragma omp parallel for num_threads(num_thread)

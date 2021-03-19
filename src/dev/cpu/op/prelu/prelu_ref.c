@@ -163,7 +163,7 @@ static int ref_prelu_uint8(struct ir_tensor* input_tensor, struct ir_tensor* out
 
     uint8_t* input_data = input_tensor->data;
     uint8_t* output_data = output_tensor->data;
-    __fp16* slope_fp16 = slope_tensor->data;
+    _fp16* slope_fp16 = slope_tensor->data;
 
     /* dequant */
     float input_scale = input_tensor->scale;

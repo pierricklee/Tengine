@@ -56,7 +56,7 @@ static inline float calc_max_fp32(const float* input, int layout, int c, int h, 
 #if MACOS
 
 #else
-static inline void calc_sum_fp16(const __fp16* input, __fp16* sum, int layout, int c, int h, int w, int cur_ch,
+static inline void calc_sum_fp16(const _fp16* input, _fp16* sum, int layout, int c, int h, int w, int cur_ch,
                                  int start_h, int start_w, int end_h, int end_w)
 {
     float sum_f = 0.0f;
@@ -73,7 +73,7 @@ static inline void calc_sum_fp16(const __fp16* input, __fp16* sum, int layout, i
     *sum = fp32_to_fp16(sum_f);
 }
 
-static inline void calc_max_fp16(const __fp16* input, __fp16* max, int layout, int c, int h, int w, int cur_ch,
+static inline void calc_max_fp16(const _fp16* input, _fp16* max, int layout, int c, int h, int w, int cur_ch,
                                  int start_h, int start_w, int end_h, int end_w)
 {
     float max_f = 0.0f;
@@ -291,12 +291,12 @@ int pooling_kernel_ref_run(struct ir_tensor* input_tensor, struct ir_tensor* out
         #if MACOS
         printf("FP16 not support mac os");
         #else
-        __fp16* input = input_tensor->data;
-        __fp16* output = output_tensor->data;
+        _fp16* input = input_tensor->data;
+        _fp16* output = output_tensor->data;
 
         for(int n = 0; n < batch; n++)
         {
-            const __fp16* input_cur = input + n * input_chw;
+            const _fp16* input_cur = input + n * input_chw;
             for(int c = 0; c < channel; c++)
             {
                 for(int ph = 0; ph < out_h; ph++)
@@ -331,14 +331,14 @@ int pooling_kernel_ref_run(struct ir_tensor* input_tensor, struct ir_tensor* out
 
                         if(method == 0)
                         {
-                            __fp16 max;
+                            _fp16 max;
                             calc_max_fp16(input_cur, &max, layout, channel, in_h, in_w,
                                         c, h_start, w_start, h_end, w_end);
                             output[offset] = max;
                         }
                         else if(method == 1)
                         {
-                            __fp16 sum;
+                            _fp16 sum;
                             calc_sum_fp16(input_cur, &sum, layout, channel, in_h, in_w,
                                         c, h_start, w_start, h_end, w_end);
                             output[offset] = fp32_to_fp16(fp16_to_fp32(sum) / pool_size);

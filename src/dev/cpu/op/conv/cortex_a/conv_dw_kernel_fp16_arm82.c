@@ -28,13 +28,13 @@
 #include "compiler_fp16.h"
 #include "conv_dw_kernel_fp16_arm82.h"
 
-void dw_k3s1p1_fp16_a76(__fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, __fp16* bias);
-void dw_k3s1p1_fp16_relu_fused_a76(__fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, __fp16* bias);
-void dw_k3s1p1_fp16_relu6_fused_a76(__fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, __fp16* bias);
+void dw_k3s1p1_fp16_a76(_fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, _fp16* bias);
+void dw_k3s1p1_fp16_relu_fused_a76(_fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, _fp16* bias);
+void dw_k3s1p1_fp16_relu6_fused_a76(_fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, _fp16* bias);
 
-void dw_k3s2_fp16_a76(__fp16* bias, __fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, long pad0);
-void dw_k3s2_fp16_relu_fused_a76(__fp16* bias, __fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, long pad0);
-void dw_k3s2_fp16_relu6_fused_a76(__fp16* bias, __fp16* input, __fp16* kernel, __fp16* output, long channel_number, long input_w, long input_h, long pad0);
+void dw_k3s2_fp16_a76(_fp16* bias, _fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, long pad0);
+void dw_k3s2_fp16_relu_fused_a76(_fp16* bias, _fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, long pad0);
+void dw_k3s2_fp16_relu6_fused_a76(_fp16* bias, _fp16* input, _fp16* kernel, _fp16* output, long channel_number, long input_w, long input_h, long pad0);
 
 int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_tensor, struct ir_tensor* bias_tensor,
                 struct ir_tensor* output_tensor, struct conv_param* param, int num_thread, int cpu_affinity)
@@ -72,17 +72,17 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
     int output_size = out_c * out_h * out_w;
 
     /* buffer addr */
-    __fp16* input_buf = input_tensor->data;
-    __fp16* kernel_buf = filter_tensor->data;
-    __fp16* output_buf = output_tensor->data;
-    __fp16* bias_buf = NULL;
+    _fp16* input_buf = input_tensor->data;
+    _fp16* kernel_buf = filter_tensor->data;
+    _fp16* output_buf = output_tensor->data;
+    _fp16* bias_buf = NULL;
     if (bias_tensor)
         bias_buf = bias_tensor->data;
 
     for (int n = 0; n < batch; n++)    // batch size
     {
-        __fp16* input = input_buf + n * input_size * group;
-        __fp16* output = output_buf + n * output_size * group;
+        _fp16* input = input_buf + n * input_size * group;
+        _fp16* output = output_buf + n * output_size * group;
         int stride = stride_h;
         int pad = pads[0];
         int channel_size = in_h * in_w;
@@ -95,10 +95,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s1p1_fp16_relu_fused_a76(cur_input, cur_kernel, cur_output, 1, in_w, in_h, cur_bias);
@@ -109,10 +109,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s1p1_fp16_relu6_fused_a76(cur_input, cur_kernel, cur_output, 1, in_w, in_h, cur_bias);
@@ -123,10 +123,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s1p1_fp16_a76(cur_input, cur_kernel, cur_output, 1, in_w, in_h, cur_bias);
@@ -140,10 +140,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s2_fp16_relu_fused_a76(cur_bias, cur_input, cur_kernel, cur_output, 1, in_w, in_h, pad);
@@ -154,10 +154,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s2_fp16_relu6_fused_a76(cur_bias, cur_input, cur_kernel, cur_output, 1, in_w, in_h, pad);
@@ -168,10 +168,10 @@ int conv_dw_fp16_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_te
                 #pragma omp parallel for num_threads(num_thread)
                 for (int i = 0; i < group; i++)
                 {
-                    __fp16* cur_input = input + i * channel_size;
-                    __fp16* cur_output = output + i * channel_size_out;
-                    __fp16* cur_kernel = kernel_buf + i * 9;
-                    __fp16* cur_bias = NULL;
+                    _fp16* cur_input = input + i * channel_size;
+                    _fp16* cur_output = output + i * channel_size_out;
+                    _fp16* cur_kernel = kernel_buf + i * 9;
+                    _fp16* cur_bias = NULL;
                     if (bias_buf)
                         cur_bias = bias_buf + i;
                     dw_k3s2_fp16_a76(cur_bias, cur_input, cur_kernel, cur_output, 1, in_w, in_h, pad);

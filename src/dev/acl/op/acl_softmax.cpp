@@ -68,8 +68,8 @@ public:
         }
         else
         {
-            __fp16* src = (__fp16*)input_org->buffer();
-            __fp16* dst = (__fp16*)_input.buffer();
+            _fp16* src = (_fp16*)input_org->buffer();
+            _fp16* dst = (_fp16*)_input.buffer();
             int w_align = info->dimension(1) + info->padding().right;
             for(int i = 0; i < size; i++)
             {

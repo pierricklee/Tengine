@@ -400,7 +400,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
 
                 fprintf(pFile, "Shape is {%d %d %d %d %d}, data type is fp16, cost to fp32\n", dim5, batch, channel, height, width);
 
-                __fp16* base_ptr = tensor->data;
+                _fp16* base_ptr = tensor->data;
 
                 for (int d5 = 0; d5 < dim5; d5++)
                 {
@@ -438,7 +438,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
                                         offset += w * channel;
                                     }
 
-                                    __fp16 val = base_ptr[offset];
+                                    _fp16 val = base_ptr[offset];
                                     float val_fp32 = fp16_to_fp32(val);
                                     if (val_fp32 < 0)
                                         fprintf(pFile, "%.4f ", val_fp32);
@@ -473,7 +473,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
 
                 fprintf(pFile, "Shape is {%d %d %d %d}, data type is fp16, cost to fp32\n", batch, channel, height, width);
 
-                __fp16* base_ptr = tensor->data;
+                _fp16* base_ptr = tensor->data;
                 for (int n = 0; n < batch; n++)
                 {
                     fprintf(pFile, "Batch %d:\n", n);
@@ -504,7 +504,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
                                     offset += w * channel;
                                 }
 
-                                __fp16 val = base_ptr[offset];
+                                _fp16 val = base_ptr[offset];
                                 float val_fp32 = fp16_to_fp32(val);
                                 if (val_fp32 < 0)
                                     fprintf(pFile, "%.4f ", val_fp32);
@@ -538,7 +538,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
 
                 fprintf(pFile, "Shape is {%d %d %d}, data type is fp16, cost to fp32\n", batch, channel, width);
 
-                __fp16* base_ptr = tensor->data;
+                _fp16* base_ptr = tensor->data;
                 for (int n = 0; n < batch; n++)
                 {
                     for (int ch = 0; ch < channel; ch++)
@@ -563,7 +563,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
                                 offset += w * channel;
                             }
 
-                            __fp16 val = base_ptr[offset];
+                            _fp16 val = base_ptr[offset];
                             float val_fp32 = fp16_to_fp32(val);
                             if (val_fp32 < 0)
                                 fprintf(pFile, "%.4f ", val_fp32);
@@ -593,7 +593,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
 
                 fprintf(pFile, "Shape is {%d %d}, data type is fp16, cost to fp32\n", height, width);
 
-                __fp16* base_ptr = tensor->data;
+                _fp16* base_ptr = tensor->data;
 
                 for (int h = 0; h < height; h++)
                 {
@@ -604,7 +604,7 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
                         offset += h * width;
                         offset += w;
 
-                        __fp16 val = base_ptr[offset];
+                        _fp16 val = base_ptr[offset];
                         float val_fp32 = fp16_to_fp32(val);
                         if (val_fp32 < 0)
                             fprintf(pFile, "%.4f ", val_fp32);
@@ -621,11 +621,11 @@ void extract_feature_blob_f32(const char* comment, const char* layer_name, const
 
                 fprintf(pFile, "Shape is {%d}, data type is fp16, cost to fp32\n", width);
 
-                __fp16* base_ptr = tensor->data;
+                _fp16* base_ptr = tensor->data;
 
                 for (int w = 0; w < width; w++)
                 {
-                    __fp16 val = base_ptr[w];
+                    _fp16 val = base_ptr[w];
                     float val_fp32 = fp16_to_fp32(val);
                     if (val_fp32 < 0)
                         fprintf(pFile, "%.4f ", val_fp32);

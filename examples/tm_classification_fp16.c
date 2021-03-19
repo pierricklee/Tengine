@@ -41,7 +41,7 @@
 #define DEFAULT_LOOP_COUNT 1
 #define DEFAULT_THREAD_COUNT 1
 
-void get_input_fp16_data(const char* image_file, __fp16* input_data, int img_h, int img_w, float* mean, float* scale)
+void get_input_fp16_data(const char* image_file, _fp16* input_data, int img_h, int img_w, float* mean, float* scale)
 {
     image img = imread_process(image_file, img_w, img_h, mean, scale);
 
@@ -83,7 +83,7 @@ int tengine_classify(const char* model_file, const char* image_file, int img_h, 
     /* set the input shape to initial the graph, and prerun graph to infer shape */
     int img_size = img_h * img_w * 3;
     int dims[] = {1, 3, img_h, img_w};    // nchw
-    __fp16* input_data = ( __fp16* )malloc(img_size * sizeof(__fp16));
+    _fp16* input_data = ( _fp16* )malloc(img_size * sizeof(_fp16));
 
     tensor_t input_tensor = get_graph_input_tensor(graph, 0, 0);
     if (input_tensor == NULL)
@@ -142,8 +142,8 @@ int tengine_classify(const char* model_file, const char* image_file, int img_h, 
 
     /* get the result of classification */
     tensor_t output_tensor = get_graph_output_tensor(graph, 0, 0);
-    __fp16* output_fp16 = ( __fp16* )get_tensor_buffer(output_tensor);
-    int output_size = get_tensor_buffer_size(output_tensor) / sizeof(__fp16);
+    _fp16* output_fp16 = ( _fp16* )get_tensor_buffer(output_tensor);
+    int output_size = get_tensor_buffer_size(output_tensor) / sizeof(_fp16);
 
     /* cast fp16 to fp32 */
     float* output_data = ( float* )malloc(output_size * sizeof(float));

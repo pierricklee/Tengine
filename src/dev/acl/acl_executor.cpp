@@ -38,15 +38,15 @@ extern "C"
 #define dynamic_cast static_cast
 #endif
 
-static inline void copy_fp32_to_fp16(__fp16* f16, const float* f32, const int f32_size)
+static inline void copy_fp32_to_fp16(_fp16* f16, const float* f32, const int f32_size)
 {
     for(unsigned int i = 0; i < f32_size / sizeof(float); i++)
         f16[i] = f32[i];
 }
 
-static inline void copy_fp16_to_fp32(float* f32, const __fp16* f16, const int f16_size)
+static inline void copy_fp16_to_fp32(float* f32, const _fp16* f16, const int f16_size)
 {
-    for(unsigned int i = 0; i < f16_size / sizeof(__fp16); i++)
+    for(unsigned int i = 0; i < f16_size / sizeof(_fp16); i++)
         f32[i] = f16[i];
 }
 
@@ -55,9 +55,9 @@ void copy_buffer(void* dest, const void* src, const int src_len, DataType dest_t
     if(dest_type == src_type)
         memcpy(dest, src, src_len);
     else if(dest_type == DataType::F16 && src_type == DataType::F32)
-        copy_fp32_to_fp16(( __fp16* )dest, ( const float* )src, src_len);
+        copy_fp32_to_fp16(( _fp16* )dest, ( const float* )src, src_len);
     else if(dest_type == DataType::F32 && src_type == DataType::F16)
-        copy_fp16_to_fp32(( float* )dest, ( const __fp16* )src, src_len);
+        copy_fp16_to_fp32(( float* )dest, ( const _fp16* )src, src_len);
     else
         fprintf(stderr, "copy_buffer may failed!!!");
 }
@@ -264,7 +264,7 @@ void copy_from_itensor_with_permuteNHWCTONCHW(CLTensor* cl_tensor, void* buf, in
     {
         assert(data_type == DataType::F16);
 
-        __fp16* pf16DataInput;
+        _fp16* pf16DataInput;
 
         for(int z = 0; z < n; z++)
         {
@@ -278,7 +278,7 @@ void copy_from_itensor_with_permuteNHWCTONCHW(CLTensor* cl_tensor, void* buf, in
                 {
                     pu8RowInputData = pu8SliceAddr_h_ele + offsetSize + j * strides[1];
 
-                    pf16DataInput = ( __fp16* )pu8RowInputData;
+                    pf16DataInput = ( _fp16* )pu8RowInputData;
                     float* pf32RowStartAddr = pf32OutStartAddr1 + j;
                     for(int k = 0; k < c; k++)
                     {

@@ -166,8 +166,8 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
         printf("FP16 not support mac os");
         #else
         int totol_size = on_in_size * out_size;
-        __fp16* input = input_tensor->data;
-        __fp16* output = output_tensor->data;
+        _fp16* input = input_tensor->data;
+        _fp16* output = output_tensor->data;
         float* input_f = ( float* )sys_malloc(totol_size * 4);
         float* output_f = ( float* )sys_malloc(totol_size * 4);
 

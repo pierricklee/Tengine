@@ -43,7 +43,7 @@ void dump_tensor_line(void* data_ptr, int offset, int data_type, int w)
         }
         case TENGINE_DT_FP16:
         {
-            __fp16* p = ( __fp16* )data_ptr;
+            _fp16* p = ( _fp16* )data_ptr;
 
 #ifdef __ARM_ARCH
             for(int i = 0; i < w - 1; i++)
@@ -721,8 +721,8 @@ int compare_tensor(tensor_t a, tensor_t b)
         }
         case TENGINE_DT_FP16:
         {
-            __fp16* a_data_ptr = (__fp16*)get_tensor_buffer(a);
-            __fp16* b_data_ptr = (__fp16*)get_tensor_buffer(b);
+            _fp16* a_data_ptr = (_fp16*)get_tensor_buffer(a);
+            _fp16* b_data_ptr = (_fp16*)get_tensor_buffer(b);
 
             for (int i = 0; i < element_size; i++)
             {

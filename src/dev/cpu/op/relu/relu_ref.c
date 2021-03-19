@@ -93,8 +93,8 @@ static int ref_relu_fp16(struct ir_tensor* input_tensor, struct ir_tensor* outpu
     float* output_data = output_tensor->data;
 
     /* cost fp16 to fp32 */
-    __fp16* input_fp16 = input_tensor->data;
-    __fp16* output_fp16 = output_tensor->data;
+    _fp16* input_fp16 = input_tensor->data;
+    _fp16* output_fp16 = output_tensor->data;
     float* input_fp32 = (float*)sys_malloc(total_size * sizeof(float));
 
     for(int i=0; i< total_size; i++)

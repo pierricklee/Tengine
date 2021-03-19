@@ -102,11 +102,11 @@ int main(int argc, char* argv[])
     fill_input_uint8_tensor_by_index(graph, 0, 0, -10.0f);
 
     // set slope data, need cost fp32 to fp16
-    __fp16* slope_fp16 = (__fp16*)sys_malloc(3 * sizeof(__fp16));
+    _fp16* slope_fp16 = (_fp16*)sys_malloc(3 * sizeof(_fp16));
     for (int k = 0; k < 3; k++)
         slope_fp16[k] = fp32_to_fp16(slope_value[k]);
 
-    fill_input_float_buffer_tensor_by_name(graph, test_node_name, 1, (void*)slope_fp16, 3 * sizeof(__fp16));
+    fill_input_float_buffer_tensor_by_name(graph, test_node_name, 1, (void*)slope_fp16, 3 * sizeof(_fp16));
 
     // graph run
     ret = test_graph_run(graph);

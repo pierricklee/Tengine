@@ -86,10 +86,10 @@ static int ref_fc_fp16(struct ir_tensor* input_tensor, struct ir_tensor* output_
     int hidden = param->hidden;
     int out_number = param->out_number;
 
-    __fp16* input = input_tensor->data;
-    __fp16* output = output_tensor->data;
-    __fp16* weight = weight_tensor->data;
-    __fp16* bias = NULL;
+    _fp16* input = input_tensor->data;
+    _fp16* output = output_tensor->data;
+    _fp16* weight = weight_tensor->data;
+    _fp16* bias = NULL;
     if (bias_tensor)
         bias = bias_tensor->data;
 
