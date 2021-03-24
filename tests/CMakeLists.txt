@@ -8,14 +8,15 @@ macro (tengine_test name file)
 endmacro()
 
 # operator level test
-tengine_test(test_op_prelu              op/test_op_prelu.c)
+# tengine_test(test_op_prelu              op/test_op_prelu.c)
 
 if (TENGINE_ENABLE_TIM_VX)
     tengine_test(test_op_prelu_timvx        op/test_op_prelu_timvx.c)
 endif()
 
-#[[ add op
+
 tengine_test(test_op_conv               op/test_op_conv.c)
+#[[ add op
 tengine_test(test_op_bias               op/test_op_bias.cpp)
 tengine_test(test_op_batchnorm          op/test_op_batchnorm.c)
 tengine_test(test_op_ceil               op/test_op_ceil.c)
@@ -97,7 +98,7 @@ tengine_test(test_param         utility/test_param.c)
 tengine_test(test_plugin        utility/test_plugin.c)
 ]]
 
-# model level test
+#[[ model level test
 tengine_test(tm_classify           models/test_tm_classification.cpp)
 tengine_test(tm_darknet_yolo       models/test_tm_darknet_yolo.cpp)
 tengine_test(tm_faster_rcnn        models/test_tm_faster_rcnn.cpp)
@@ -113,6 +114,7 @@ tengine_test(tm_yufacedetect       models/test_tm_yufacedetect.cpp)
 tengine_test(test_tm_landmark      models/test_tm_landmark.cpp)
 tengine_test(test_tm_yolact        models/test_tm_yolact.cpp)
 tengine_test(tm_mfn                models/test_tm_mfn.cpp)
+
 
 #
 #tengine_test(test_tiny.c tiny_graph_generated.c utility/tiny)
@@ -132,4 +134,4 @@ if(OpenCV_FOUND)
 else()
     message(WARNING "OpenCV not found, some examples won't be built")
 endif()
-
+]]#

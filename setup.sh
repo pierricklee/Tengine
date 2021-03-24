@@ -1,2 +1,2 @@
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/rv64-linux-gnu.toolchain.cmake ..;
-make -j8;
+make -j20;
