@@ -50,30 +50,26 @@ vmerge_4:
     .hidden tran_inp_4
     
 tran_inp_4:
+    li          t2, 4
+    vsetvli     x0, t2, e32, m1, d1
+    addi    sp, sp, -96
     # sub	sp, sp, 0x40
-    addi    sp, sp, -120
     # stp	d8, d9, [sp]
 	# stp	d10,d11,[sp, 0x10]
 	# stp	d12,d13,[sp, 0x20]
 	# stp	d14,d15,[sp, 0x30]
-    vsb.v   v4, (sp)
-    addi    sp, sp, 0x10
-    vsb.v   v5, (sp)
-    addi    sp, sp, 0x10
-    vsb.v   v6, (sp)
-    addi    sp, sp, 0x10
-    vsb.v   v7, (sp)
-    addi    sp, sp, -0x30
-    sd      s0, 56(sp)              # 
-    sd      s1, 64(sp)              # 
-    sd      s2, 72(sp)              # x12
-    sd      s3, 80(sp)              # x13
-    sd      s4, 88(sp)              # x14
-    sd      s5, 96(sp)              # x15
-    sd      s6, 104(sp)             # x16
-    sd      s7, 112(sp)             # x17
-    sd      s8, 120(sp)             # x18
-    sd      s9, 128(sp)             # x9
+    sd      s0, 0(sp)              # 
+    sd      s1, 8(sp)              # x11
+    sd      s2, 16(sp)             # x12
+    sd      s3, 24(sp)             # x13
+    sd      s4, 32(sp)             # x14
+    sd      s5, 40(sp)             # x15
+    sd      s6, 48(sp)             # x16
+    sd      s7, 56(sp)             # x17
+    sd      s8, 64(sp)             # x18
+    sd      s9, 72(sp)             # x9
+    sd      s10, 80(sp)            # x10
+    sd      s11, 88(sp) 
 
     la      s0, vmerge_4            # 1111 0000 0000 0000 
     
@@ -102,33 +98,33 @@ comput_idx:
 load:
     //v0 1 2 3 4 5 
     # ld4 {v0.4s, v1.4s, v2.4s,v3.4s}, [x11]
-    # load 进入 v24, v1, v2, v3, v4, v5
-    li      t0, 4
-    vlsw.v  v24, (s1), t0
-    addi    s1, s1, 4
-    vlsw.v  v1, (s1), t0
-    addi    s1, s1, 4
-    vlsw.v  v2, (s1), t0
-    addi    s1, s1, 4
-    vlsw.v  v3, (s1), t0
+    li              t0, 4
+    vlsw.v          v24, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v1, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v2, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v3, (s1), t0
     # ldr	q31, [x11, 0x40]	
-    addi    s1, s1, 0x30
-    vlw.v   v31, (s1)
+    addi            s1, s1, 0x30
+    vlw.v           v31, (s1)
+    addi            s1, s1, -0x40
     
     # 放入 v24, v1, v2, v3, v4, v5
     # ext v4.16b,v0.16b,v31.16b,#4
-    vslidedown.vi v25, v24, 12              # v24 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vlb.v         v0, (s0)
-    vmerge.vvm  v4, v26, v25, v0             # v25 ? v26
+    vslidedown.vi   v25, v24, 12
+    vslideup.vi     v26, v31, 4
+    vlb.v           v0, (s0)
+    vmerge.vvm      v4, v26, v25, v0
     # ext v31.16b,v31.16b,v31.16b,#4
-    vslidedown.vi v25, v31, 12              # v31 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm   v31, v26, v25, v0            # v25 ? v26
+    vslidedown.vi   v25, v31, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v31, v26, v25, v0
     # ext v5.16b,v1.16b,v31.16b,#4
-    vslidedown.vi v25, v1, 12              # v1 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm   v5, v26, v25, v0             # v25 ? v26
+    vslidedown.vi   v25, v1, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v5, v26, v25, v0
 
     # free v14, v15, v0
 
@@ -150,17 +146,17 @@ load:
     
     # 放入 v6, v7, v8, v9, v10, v11
     # ext v10.16b,v6.16b,v31.16b,#4
-    vslidedown.vi v25, v6, 12              # v6 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm   v10, v26, v25, v0             # v25 ? v26
-    # ext v31.16b,v31.16b,v31.16b,#4
-    vslidedown.vi v25, v31, 12              # v31 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v31, v26, v25, v0            # v25  ? v26
+    vslidedown.vi           v25, v6, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v10, v26, v25, v0
+    # ext v31.16b,v31.16b,v31.16b,#
+    vslidedown.vi           v25, v31, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v31, v26, v25, v0
     # ext v11.16b,v7.16b,v31.16b,#4
-    vslidedown.vi v25, v7, 12              # v7 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v11, v26, v25, v0            # v14 ? v15
+    vslidedown.vi           v25, v7, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v11, v26, v25, v0
 
     # add x6,x5,#0x40
     addi      a6, a5, 0x40
@@ -183,17 +179,17 @@ load:
     add     s8, a1, s7
     # 放入 v12, v13, v14, v15, v16, v17
     # ext v16.16b,v12.16b,v31.16b,#4
-    vslidedown.vi v25, v12, 12              # v12 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v16, v26, v25, v0             # v25 ? v26
-    # ext v31.16b,v31.16b,v31.16b,#4
-    vslidedown.vi v25, v31, 12              # v31 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v31, v26, v25, v0            # v25 ? v26
-    # ext v17.16b,v13.16b,v31.16b,#4
-    vslidedown.vi v25, v13, 12              # v13 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v17, v26, v25, v0            # v25 ? v26
+    vslidedown.vi           v25, v12, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v16, v26, v25, v0
+    # ext v31.16b,v31.16b,v31.16b,#
+    vslidedown.vi           v25, v31, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v31, v26, v25, v0
+    # ext v17.16b,v13.16b,v31.16b,#
+    vslidedown.vi           v25, v13, 12
+    vslideup.vi             v26, v31, 4
+    vmerge.vvm              v17, v26, v25, v0
 
     # 放入 v18, v19, v20, v21, v22, v23
     # ld4 {v18.4s, v19.4s, v20.4s,v21.4s}, [x14]
@@ -209,17 +205,17 @@ load:
     vlw.v   v31, (s4)
     
     # ext v22.16b,v18.16b,v31.16b,#4
-    vslidedown.vi v25, v18, 12              # v22 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v22, v26, v25, v0             # v25 ? v26
+    vslidedown.vi       v25, v18, 12
+    vslideup.vi         v26, v31, 4
+    vmerge.vvm          v22, v26, v25, v0
     # ext v31.16b,v31.16b,v31.16b,#4
-    vslidedown.vi v25, v31, 12              # v31 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v31, v26, v25, v0            # v25 ? v26
+    vslidedown.vi       v25, v31, 12
+    vslideup.vi         v26, v31, 4
+    vmerge.vvm          v31, v26, v25, v0
     # ext v23.16b,v19.16b,v31.16b,#4
-    vslidedown.vi v25, v19, 12              # v23 -> v25
-    vslideup.vi v26, v31, 4                 # v31 -> v26
-    vmerge.vvm v23, v26, v25, v0            # v25 ? v26
+    vslidedown.vi       v25, v19, 12
+    vslideup.vi         v26, v31, 4
+    vmerge.vvm          v23, v26, v25, v0
 
     # ldr	q30, [x2]
     flw     ft0, 0(a2)
@@ -298,15 +294,15 @@ line1://add x18,x1,x17,[x18+=x4]
     vfnmsac.vf  v29, ft2, v25
  
     # str q29, [x18]
-	# movi	d28, 0x0
+    # movi	d28, 0x0
+    # movi	d29, 0x0
+    vlw.v       v29, (s8)
 	vmv.v.i     v28, 0
-	# movi	d29, 0x0
     vmv.v.i     v29, 0
+
     # fsub    v31.4s,v27.4s, v25.4s
     # fmls	v28.4s, v24.4s,  v30.s[1]
     # fadd    v25.4s, v17.4s,v23.4s
-    vsw.v       v29, (s8)
-    vmv.v.i       v14, 0
     vfsub.vv    v31, v27, v25
     vfnmsac.vf  v28, ft1, v24
     vfadd.vv    v25, v17, v23
@@ -339,6 +335,7 @@ line1://add x18,x1,x17,[x18+=x4]
     # str q31, [x18]
     add         s8, s8, a4
     vsw.v       v31, (s8)
+    
     # //v25 as inp0
     # fmla	v29.4s, v25.4s,  v30.s[0]
     # add x18,x18,x4
@@ -379,9 +376,10 @@ line2://add x18,x1,x17,LSL 1  (add x9,x18,x17)
     vfnmsac.vf  v26, ft2, v9
     vfnmsac.vf  v27, ft2, v10
 
-    #  movi	d28, 0x0            ??
+    #  movi	d28, 0x0
+    vmv.v.x         v28, x0
     # add x9,x18,x17
-    add     s9, s8, s7
+    add             s9, s8, s7
 
     # //v29 as inp0
     # fsub    v29.4s, v18.4s,  v12.4s
@@ -417,20 +415,21 @@ line2://add x18,x1,x17,LSL 1  (add x9,x18,x17)
     # add x18,x18,x4
     # fmls	v29.4s, v25.4s,  v30.s[2]
     # str q29, [x18]
-	# movi	d28, 0x0
+    vsw.v		    v31, (s8)
+    vfmacc.vf	    v29, ft2, v24
+    add             s8, s8, a4
+    vfnmsac.vf	    v29, ft2, v25
+    vsw.v		    v29, (s8)
+	
+    # movi	d28, 0x0
+    # movi	d29, 0x0
 	vmv.v.i     v28, 0
-	# movi	d29, 0x0
     vmv.v.i     v29, 0
+
     # fsub    v31.4s,v27.4s, v25.4s
     # fmls	v28.4s, v24.4s,  v30.s[1]
     # fsub    v25.4s,v23.4s,v17.4s
-    # fadd    v28.4s,v28.4s,v31.4s
-	vsw.v		v31, (s8)
-	vfmacc.vf	v29, ft2, v24
-	add		    s8, s8,  a4
-	vfnmsac.vf	v29, ft2, v25
-	vsw.v		v29, (s8)
-    
+    # fadd    v28.4s,v28.4s,v31.4s    
 	vfsub.vv	v31, v27, v25
 	vfnmsac.vf	v28, ft1, v24
 	vfsub.vv	v25, v23, v17
@@ -440,61 +439,63 @@ line2://add x18,x1,x17,LSL 1  (add x9,x18,x17)
     # fmla	v31.4s, v24.4s,  v30.s[1]
     # fmla	v28.4s, v26.4s,  v30.s[1]
     # fmla	v29.4s, v24.4s,  v30.s[2]
-    # add x18,x18,x4
-    # str q28, [x18]
-    # fmls	v25.4s, v11.4s,  v30.s[2]
-    # fmls	v29.4s, v26.4s,  v30.s[3]
-    # fmls	v31.4s, v26.4s,  v30.s[1]
-    # add x18,x18,x4
-    # str q31, [x18]
-    # //v25 as inp0
-    # fmla	v29.4s, v25.4s,  v30.s[0]
-    # add x18,x18,x4
-    # str q29, [x18]	
-	vfmacc.vf	v25, ft2, v5
+    vfmacc.vf	v25, ft2, v5
 	vfmacc.vf	v31, ft1, v24
 	vfmacc.vf	v28, ft1, v26
 	vfmacc.vf	v29, ft2, v24
-	add		    s8, s8,  a4
-	vlw.v		v28, (s8)
-	vfnmsac.vf	v25, ft2, v11
+
+    # add x18,x18,x4
+    # str q28, [x18]
+    add		    s8, s8,  a4
+    vlw.v		v28, (s8)
+
+    # fmls	v25.4s, v11.4s,  v30.s[2]
+    # fmls	v29.4s, v26.4s,  v30.s[3]
+    # fmls	v31.4s, v26.4s,  v30.s[1]
+    vfnmsac.vf	v25, ft2, v11
 	vfnmsac.vf	v29, ft3, v26
 	vfnmsac.vf	v31, ft1, v26
-	add		    s8, s8,  a4
+    
+    # add x18,x18,x4
+    # str q31, [x18]
+    add		    s8, s8, a4
 	vsw.v		v31, (s8)
-	# //v25 as inp0
+
+    # //v25 as inp0
+    # fmla	v29.4s, v25.4s,  v30.s[0]
+    # add x18,x18,x4
+    # str q29, [x18]
 	vfmacc.vf	v29, ft0, v25
-	add		    s8, s8,  a4
-	vsw.v		    v29, (s8)
+	add		    s8, s8, a4
+	vsw.v		v29, (s8)
 
 line3://mov x18,x9 [x18+=x4]
     # fsub	v24.4s, v19.4s,  v7.4s
     # fsub	v25.4s, v20.4s,  v8.4s
     # fsub	v26.4s, v21.4s,  v9.4s
     # fsub	v27.4s, v22.4s,  v10.4s
-    # mov x18,x9
-    # fmls	v24.4s, v1.4s,  v30.s[1]
-    # fmls	v25.4s, v2.4s,  v30.s[1]
-    # fmls	v26.4s, v3.4s,  v30.s[1]
-    # fmls	v27.4s, v4.4s,  v30.s[1]
-    # movi	d28, 0x0
-	vmv.v.i     v28, 0
-    # fmla	v24.4s, v13.4s,  v30.s[1]
-    # fmla	v25.4s, v14.4s,  v30.s[1]
     vfsub.vv	v24, v19, v7
     vfsub.vv	v25, v20, v8
     vfsub.vv	v26, v21, v9
     vfsub.vv	v27, v22, v10
-	mv			s8,  s9
+    # mov x18,x9
+    mv			s8,  s9
+    # fmls	v24.4s, v1.4s,  v30.s[1]
+    # fmls	v25.4s, v2.4s,  v30.s[1]
+    # fmls	v26.4s, v3.4s,  v30.s[1]
+    # fmls	v27.4s, v4.4s,  v30.s[1]
     vfnmsac.vf	v24, ft1, v1
     vfnmsac.vf	v25, ft1, v2
     vfnmsac.vf	v26, ft1, v3
     vfnmsac.vf	v27, ft1, v4
+    
     # movi	d28, 0x0
-	vmv.v.i     v28, 0
+    # fmla	v24.4s, v13.4s,  v30.s[1]
+    # fmla	v25.4s, v14.4s,  v30.s[1]
+    vmv.v.i     v28, 0
     vfmacc.vf	v24, ft1, v13
     vfmacc.vf	v25, ft1, v14
-    
+
     # fmla	v26.4s, v15.4s,  v30.s[1]
     # fmla	v27.4s, v16.4s,  v30.s[1]
     vfmacc.vf	v26, ft1, v15
@@ -521,10 +522,6 @@ line3://mov x18,x9 [x18+=x4]
     vfnmsac.vf	v31, ft2, v24
     vfmacc.vf	v28, ft2, v29
 
-    # movi	d28, 0x0
-    # movi	d29, 0x0
-	vmv.v.i     v28, 0
-    vmv.v.i     v29, 0
     # str q28, [x18]
     # fmls	v31.4s, v25.4s,  v30.s[2]
     # add x18,x18,x4
@@ -535,18 +532,23 @@ line3://mov x18,x9 [x18+=x4]
     add		s8, s8,  a4
     vfsub.vv	v29, v27, v26
     vlw.v		v31, (s8)
+    
     # fmla	v29.4s, v24.4s,  v30.s[2]
     # add x18,x18,x4
     # fmls	v29.4s, v25.4s,  v30.s[2]
     # str q29, [x18]
-    # fsub    v31.4s,v27.4s, v25.4s
-    # fmls	v28.4s, v24.4s,  v30.s[1]
-    # fsub    v25.4s,v23.4s,v11.4s
     vfmacc.vf	v29, ft2, v24
     add		s8, s8,  a4
     vfnmsac.vf	v29, ft2, v25
     vlw.v		v29, (s8)
-	vmv.v.i       v14, 0
+	
+    # movi	d28, 0x0
+    # movi	d29, 0x0
+	vmv.v.i     v28, 0
+    vmv.v.i     v29, 0
+    # fsub    v31.4s,v27.4s, v25.4s
+    # fmls	v28.4s, v24.4s,  v30.s[1]
+    # fsub    v25.4s,v23.4s,v11.4s
     vfsub.vv	v31, v27, v25
     vfnmsac.vf	v28, ft1, v24
     vfsub.vv	v25, v23, v11
@@ -580,7 +582,6 @@ line3://mov x18,x9 [x18+=x4]
     # fmla	v29.4s, v25.4s,  v30.s[0]
     add		s8, s8,  a4
     vlw.v		v31, (s8)
-    # //v25 as inp0
     vfmacc.vf	v29, ft0, v25
 
     # add x18,x18,x4
@@ -714,10 +715,31 @@ line4://add x18,x1,x17,LSL 2  ((add x9,x18,x17))
 line0: // addr:   str q28, [x1], add x18,x1,x4
     //v0 1 2 3 4 5 
     # ld4 {v0.4s, v1.4s, v2.4s,v3.4s}, [x0]
+    li              t0, 4
+    vlsw.v          v18, (a0), t0
+    addi            a0, a0, 4
+    vlsw.v          v19, (a0), t0
+    addi            a0, a0, 4
+    vlsw.v          v20, (a0), t0
+    addi            a0, a0, 4
+    vlsw.v          v21, (a0), t0
+    addi            a0, a0, 0x30
     # ldr	q31, [x0, 0x40]	
+    vlw.v           v31, (a0)
+    addi            a0, a0, -0x40
     # ext v4.16b,v0.16b,v31.16b,#4
+    vslidedown.vi   v25, v24, 12
+    vslideup.vi     v26, v31, 4
+    vlb.v           v0, (s0)
+    vmerge.vvm      v4, v26, v25, v0
     # ext v31.16b,v31.16b,v31.16b,#4
+    vslidedown.vi   v25, v31, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v31, v26, v25, v0
     # ext v5.16b,v1.16b,v31.16b,#4
+    vslidedown.vi   v25, v1, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v5, v26, v25, v0
     
     # movi	d29, 0x0
     # movi	d24, 0x0
@@ -857,18 +879,61 @@ line5://
     //v0 1 2 3 4 5 
     # ld4 {v0.4s, v1.4s, v2.4s,v3.4s}, [x11]
     # ldr	q31, [x11, 0x40]	
+    li              t0, 4
+    vlsw.v          v24, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v1, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v2, (s1), t0
+    addi            s1, s1, 4
+    vlsw.v          v3, (s1), t0
+    addi            s1, s1, 0x30
+    vlw.v           v31, (s1)
+    addi            s1, s1, -0x40
+
     # ext v4.16b,v0.16b,v31.16b,#4
-    # ext v31.16b,v31.16b,v31.16b,#4
+    vslidedown.vi   v25, v24, 12
+    vslideup.vi     v26, v31, 4
+    vlb.v           v0, (s0)
+    vmerge.vvm      v4, v26, v25, v0
+    # ext v31.16b,v31.16b,v31.16b,#
+    vslidedown.vi   v25, v31, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v31, v26, v25, v0  
     # ext v5.16b,v1.16b,v31.16b,#4
+    vslidedown.vi   v25, v1, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v5, v26, v25, v0
 
     # //v18 19 20 21 22 23
     # add x14,x14,x3     
-    add		s4, s4,  s3 
+    add		s4, s4, a3 
     # ld4 {v18.4s, v19.4s, v20.4s,v21.4s}, [x14]
+    li              t0, 4
+    vlsw.v          v18, (s4), t0
+    addi            s4, s4, 4
+    vlsw.v          v19, (s4), t0
+    addi            s4, s4, 4
+    vlsw.v          v20, (s4), t0
+    addi            s4, s4, 4
+    vlsw.v          v21, (s4), t0
+    addi            s4, s4, 0x30
     # ldr	q31, [x14, 0x40]	
+    vlw.v           v31, (s4)
+    addi            s4, s4, -0x40
     # ext v22.16b,v18.16b,v31.16b,#4
+    vslidedown.vi   v25, v18, 12
+    vslideup.vi     v26, v31, 4
+    vlb.v           v0, (s0)
+    vmerge.vvm      v22, v26, v25, v0
     # ext v31.16b,v31.16b,v31.16b,#4
+    vslidedown.vi   v25, v31, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v31, v26, v25, v0  
     # ext v23.16b,v19.16b,v31.16b,#4
+    vslidedown.vi   v25, v19, 12
+    vslideup.vi     v26, v31, 4
+    vmerge.vvm      v23, v26, v25, v0
 
     # movi	d24, 0x0
 	# movi	d25, 0x0
@@ -1020,7 +1085,20 @@ return:
 	# ldp	d12, d13, [sp, 0x20]
 	# ldp	d14, d15, [sp, 0x30]
 	# add	sp, sp, 0x40
-	
+	ld          s0, 0(sp)
+    ld          s1, 8(sp)
+    ld          s2, 16(sp)
+    ld          s3, 24(sp)
+    ld          s4, 32(sp)
+    ld          s5, 40(sp)
+    ld          s6, 48(sp)
+    ld          s7, 56(sp)
+    ld          s8, 64(sp)
+    ld          s9, 72(sp)
+    ld          s10, 80(sp)
+    ld          s11, 88(sp)
+    addi        sp, sp, 96
+    
     ret
         .end
 

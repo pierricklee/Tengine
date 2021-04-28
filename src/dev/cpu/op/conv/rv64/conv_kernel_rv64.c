@@ -27,8 +27,8 @@
 #include <math.h>
 
 #include "conv_kernel_rv64.h"
-// #include "wino_conv_kernel_arm.h"    // FIXME: add wino support
-// #include "wino_conv_kernel_1_arm.h"  // FIXME: add wino support
+#include "wino_conv_kernel_rv64.h"    // FIXME: add wino support
+// #include "wino_conv_kernel_1_rv64.h"  // FIXME: add wino support
 
 #define PER_OUT_CHAN 16
 void sgemm_4x16_rv64(float* biases, float* input, float* kernel, long kernel_size, float* output, long output_xy,
@@ -509,14 +509,14 @@ int conv_hcl_prerun(struct ir_tensor* input_tensor, struct ir_tensor* filter_ten
     int in_w = input_tensor->dims[3];
 
     /* check winograd implement, only for conv3x3s1 */
-    // priv_info->winograd = winograd_support(param, in_h, in_w);
-    // if (priv_info->winograd)
-    // {
-    //     if(in_c >= 256)
-    //         // return wino_conv_hcl_prerun_1(input_tensor, filter_tensor, output_tensor, priv_info, param); // FIXME: add wino support
-    //     else
-    //         // return wino_conv_hcl_prerun(input_tensor, filter_tensor, output_tensor, priv_info, param);   // FIXME: add wino support
-    // }
+    priv_info->winograd = winograd_support(param, in_h, in_w);
+    if (priv_info->winograd)
+    {
+        if(in_c >= 256)
+            return wino_conv_hcl_prerun(input_tensor, filter_tensor, output_tensor, priv_info, param); // FIXME: add wino support
+        else
+            return wino_conv_hcl_prerun(input_tensor, filter_tensor, output_tensor, priv_info, param);   // FIXME: add wino support
+    }
 
     /* alloc mem of im2col  */
     if (!priv_info->external_im2col_mem)

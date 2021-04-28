@@ -9,7 +9,6 @@
 
 #include "compiler_fp16.h"
 #include "tengine_c_api.h"
-#include "tengine_ir.h"
 
 #define TENSOR_SHOW_LEADING_BLANK "    "
 #define TENSOR_FLOAT_EPSILON 0.0001f
@@ -377,42 +376,6 @@ int fill_fp32_tensor(tensor_t tensor, float value)
 }
 
 
-int fill_uint8_tensor(tensor_t tensor, float value)
-{
-    int dims[MAX_SHAPE_DIM_NUM];
-    int dims_count = get_tensor_shape(tensor, dims, MAX_SHAPE_DIM_NUM);
-
-    int type = get_tensor_data_type(tensor);
-
-    if (TENGINE_DT_UINT8 != type)
-        return -1;
-
-    int element_count = 1;
-    for (int i = 0; i < dims_count; i++)
-        element_count *= dims[i];
-
-    if (0 == element_count)
-        return -1;
-
-    float input_scale = 0.f;
-    int input_zero_point = 0;
-    get_tensor_quant_param(tensor, &input_scale, &input_zero_point, 1);
-
-    uint8_t * data_ptr = (uint8_t *)get_tensor_buffer(tensor);
-    for (int i = 0; i < element_count; i++)
-    {
-        int udata = (round)(value / input_scale + (float)input_zero_point);
-        if (udata > 255)
-            udata = 255;
-        else if (udata < 0)
-            udata = 0;
-        data_ptr[i] = udata;
-    }
-
-    return 0;
-}
-
-
 void fill_input_float_tensor_by_index(graph_t graph, int input_node_index, int tensor_index, float value)
 {
     tensor_t tensor = get_graph_input_tensor(graph, input_node_index, tensor_index);
@@ -430,25 +393,6 @@ void fill_input_float_tensor_by_index(graph_t graph, int input_node_index, int t
         fprintf(stderr, "Set buffer for tensor failed. ERRNO: %d.\n", get_tengine_errno());
 
     ret = fill_fp32_tensor(tensor, value);
-    if(0 != ret)
-        fprintf(stderr, "Fill buffer for tensor failed. ERRNO: %d.\n", get_tengine_errno());
-}
-
-
-void fill_input_uint8_tensor_by_index(graph_t graph, int input_node_index, int tensor_index, float value)
-{
-    tensor_t tensor = get_graph_input_tensor(graph, input_node_index, tensor_index);
-    if(NULL == tensor)
-        fprintf(stderr, "Cannot find the %dth tensor via node index(%d). ERRNO: %d.\n", tensor_index, input_node_index, get_tengine_errno());
-
-    int buf_size = get_tensor_buffer_size(tensor);
-    uint8_t* data = (uint8_t* )malloc(buf_size);
-
-    int ret = set_tensor_buffer(tensor, (void* )data, buf_size);
-    if(0 != ret)
-        fprintf(stderr, "Set buffer for tensor failed. ERRNO: %d.\n", get_tengine_errno());
-
-    ret = fill_uint8_tensor(tensor, value);
     if(0 != ret)
         fprintf(stderr, "Fill buffer for tensor failed. ERRNO: %d.\n", get_tengine_errno());
 }
@@ -477,22 +421,6 @@ void fill_input_float_tensor_by_name(graph_t graph, const char* node_name, int t
     ret = fill_fp32_tensor(tensor, value);
     if(0 != ret)
         fprintf(stderr, "Fill buffer for tensor failed. ERRNO: %d.\n", get_tengine_errno());
-}
-
-
-void fill_input_float_buffer_tensor_by_name(graph_t graph, const char* node_name, int tensor_index, void* value, int buf_size)
-{
-    node_t node = get_graph_node(graph, node_name);
-    if(NULL == node)
-        fprintf(stderr, "Cannot get node via node name(%s). ERRNO: %d.\n", node_name, get_tengine_errno());
-
-    tensor_t tensor = get_node_input_tensor(node, tensor_index);
-    if(NULL == tensor)
-        fprintf(stderr, "Cannot find the %dth tensor via node name(%s). ERRNO: %d.\n", tensor_index, node_name, get_tengine_errno());
-
-    int ret = set_tensor_buffer(tensor, value, buf_size);
-    if(0 != ret)
-        fprintf(stderr, "Set buffer for tensor failed.\n");
 }
 
 
@@ -575,63 +503,6 @@ void test_graph_release(graph_t graph)
 graph_t create_common_test_graph(const char* test_node_name, int data_type, int layout, int n, int c, int h, int w, common_test test_func)
 {
     graph_t graph = create_graph(NULL, NULL, NULL);
-    if(NULL == graph)
-    {
-        fprintf(stderr, "get graph failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    if(set_graph_layout(graph, layout) < 0)
-    {
-        fprintf(stderr, "set layout failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    const char* input_name = "input_node";
-    if(create_input_node(graph, input_name, data_type, layout, n, c, h, w) < 0)
-    {
-        fprintf(stderr, "create input node failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    if(test_func(graph, input_name, test_node_name, data_type, layout, n, c, h ,w) < 0)
-    {
-        fprintf(stderr, "create test node failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    /* set input/output node */
-    const char* inputs[] = {input_name};
-    const char* outputs[] = {test_node_name};
-
-    if(set_graph_input_node(graph, inputs, sizeof(inputs) / sizeof(char*)) < 0)
-    {
-        fprintf(stderr, "set inputs failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    if(set_graph_output_node(graph, outputs, sizeof(outputs) / sizeof(char*)) < 0)
-    {
-        fprintf(stderr, "set outputs failed. ERRNO: %d.\n", get_tengine_errno());
-        return NULL;
-    }
-
-    return graph;
-}
-
-
-graph_t create_timvx_test_graph(const char* test_node_name, int data_type, int layout, int n, int c, int h, int w, common_test test_func)
-{
-    /* create VeriSilicon TIM-VX backend */
-    context_t timvx_context = create_context("timvx", 1);
-    int rtt = add_context_device(timvx_context, "TIMVX");
-    if (0 > rtt)
-    {
-        fprintf(stderr, " add_context_device VSI DEVICE failed.\n");
-        return NULL;
-    }
-
-    graph_t graph = create_graph(timvx_context, NULL, NULL);
     if(NULL == graph)
     {
         fprintf(stderr, "get graph failed. ERRNO: %d.\n", get_tengine_errno());
@@ -782,13 +653,13 @@ int compare_tensor(tensor_t a, tensor_t b)
 }
 
 
-static inline unsigned long get_current_time(void)
-{
-    struct timespec tm;
+// static inline unsigned long get_current_time(void)
+// {
+//     struct timespec tm;
 
-    clock_gettime(CLOCK_MONOTONIC, &tm);
+//     clock_gettime(CLOCK_MONOTONIC, &tm);
 
-    return (tm.tv_sec * 1000000 + tm.tv_nsec / 1000);
-}
+//     return (tm.tv_sec * 1000000 + tm.tv_nsec / 1000);
+// }
 
 #endif
